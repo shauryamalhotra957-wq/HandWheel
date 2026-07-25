@@ -6,6 +6,30 @@ XInput controllers.
 
 The camera frames and hand landmarks stay on your computer. Nothing is uploaded.
 
+## How it works
+
+![HandWheel webcam-to-game steering pipeline](docs/how-it-works.svg)
+
+1. **Capture:** OpenCV reads the selected webcam. Tracking always uses one
+   canonical mirrored coordinate system, so changing the preview's Mirror option
+   cannot reverse steering or invalidate calibration.
+2. **Detect:** MediaPipe finds 21 landmarks per detected hand. HandWheel accepts
+   steering only when exactly two hands are present, then averages the wrist and
+   four knuckle landmarks (`0`, `5`, `9`, `13`, and `17`) to locate each palm
+   without depending on finger position.
+3. **Measure:** The line between those palm centers acts like the axle of an
+   invisible wheel. Calibration accepts 24 stable samples and saves their neutral
+   angle and typical hand spacing.
+4. **Shape:** The angle relative to neutral passes through a three-sample median,
+   is divided by the steering range and clamped to `-1.0` through `+1.0`, then
+   passes through optional inversion, a rescaled dead zone, response curve, and
+   motion-adaptive smoothing.
+5. **Drive safely:** A separate 100 Hz loop maps the value to a virtual Xbox 360
+   controller's left-stick X axis. It sends steering only while output is armed
+   and fresh. Tracking loss returns toward center, stale input disarms through a
+   watchdog, and **F8** immediately neutralizes output from a dedicated hotkey
+   thread.
+
 ## What it does
 
 - Tracks two hands locally with MediaPipe.
@@ -149,6 +173,8 @@ Install the test tools and run the unit tests:
 .\setup.ps1 -PreviewOnly -WithDevTools
 .\.venv\Scripts\python.exe -m pytest
 ```
+
+Every push and pull request also runs the unit tests on a clean Windows runner.
 
 The hand tracking follows Google's current
 [MediaPipe Hand Landmarker Python API](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/python).
