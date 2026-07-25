@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 930" role="img" aria-labelledby="title description">
+  <title id="title">How HandWheel turns hand movement into game steering</title>
+  <desc id="description">A five-stage pipeline from webcam capture through local hand tracking, palm-axis measurement, steering shaping, and a virtual Xbox controller, with safety controls for tracking loss, stale input, and emergency neutral.</desc>
+
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b0f16"/>
+      <stop offset="1" stop-color="#101725"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#41b4ff"/>
+      <stop offset="1" stop-color="#7de6bc"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#41b4ff"/>
+    </marker>
+    <style>
+      .title { font: 700 42px "Segoe UI", Arial, sans-serif; fill: #f5f9ff; letter-spacing: 1px; }
+      .subtitle { font: 400 19px "Segoe UI", Arial, sans-serif; fill: #9aa8bb; }
+      .step { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #071018; }
+      .eyebrow { font: 700 14px "Segoe UI", Arial, sans-serif; fill: #7de6bc; letter-spacing: 2px; }
+      .card-title { font: 700 23px "Segoe UI", Arial, sans-serif; fill: #f5f9ff; }
+      .card-copy { font: 400 16px "Segoe UI", Arial, sans-serif; fill: #aeb9c8; }
+      .card-detail { font: 600 15px "Segoe UI", Arial, sans-serif; fill: #d9e1eb; }
+      .safety-title { font: 700 25px "Segoe UI", Arial, sans-serif; fill: #f5f9ff; }
+      .safety-copy { font: 400 15px "Segoe UI", Arial, sans-serif; fill: #aeb9c8; }
+      .safety-label { font: 700 17px "Segoe UI", Arial, sans-serif; fill: #f5f9ff; }
+      .safety-green { fill: #7de6bc; }
+      .safety-yellow { fill: #ffc44b; }
+      .safety-blue { fill: #41b4ff; }
+      .safety-red { fill: #e66970; }
+      .footer { font: 600 15px "Segoe UI", Arial, sans-serif; fill: #7f8da1; letter-spacing: 0.5px; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="930" rx="34" fill="url(#background)"/>
+  <circle cx="1500" cy="55" r="180" fill="#41b4ff" opacity="0.035"/>
+  <circle cx="90" cy="900" r="220" fill="#7de6bc" opacity="0.025"/>
+
+  <text x="60" y="64" class="eyebrow">HANDWHEEL SIGNAL PATH</text>
+  <text x="60" y="113" class="title">Your hands become a safe steering signal</text>
+  <text x="60" y="145" class="subtitle">Every camera frame is processed locally; only a normalized left-stick value reaches the game.</text>
+
+  <!-- Pipeline arrows -->
+  <path d="M 335 350 H 346" fill="none" stroke="#41b4ff" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M 640 350 H 651" fill="none" stroke="#41b4ff" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M 945 350 H 956" fill="none" stroke="#41b4ff" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M 1250 350 H 1261" fill="none" stroke="#41b4ff" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- 1: Capture -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="175" width="280" height="350" rx="24" fill="#151d29" stroke="#263244"/>
+  </g>
+  <circle cx="82" cy="207" r="17" fill="url(#accent)"/>
+  <text x="82" y="212" class="step" text-anchor="middle">1</text>
+  <g stroke="#41b4ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="126" y="225" width="128" height="82" rx="14"/>
+    <circle cx="190" cy="266" r="24"/>
+    <path d="M 254 249 L 278 237 V 295 L 254 283"/>
+  </g>
+  <text x="190" y="354" class="eyebrow" text-anchor="middle">CAPTURE</text>
+  <text x="190" y="388" class="card-title" text-anchor="middle">Webcam frame</text>
+  <text x="190" y="426" class="card-copy" text-anchor="middle">OpenCV • 30 FPS target</text>
+  <text x="190" y="454" class="card-detail" text-anchor="middle">Canonical mirrored</text>
+  <text x="190" y="478" class="card-detail" text-anchor="middle">tracking coordinates</text>
+
+  <!-- 2: Detect -->
+  <g filter="url(#shadow)">
+    <rect x="355" y="175" width="280" height="350" rx="24" fill="#151d29" stroke="#263244"/>
+  </g>
+  <circle cx="387" cy="207" r="17" fill="url(#accent)"/>
+  <text x="387" y="212" class="step" text-anchor="middle">2</text>
+  <g stroke="#7de6bc" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 478 300 C 466 282 465 261 476 247 C 483 238 492 245 493 254 L 496 272"/>
+    <path d="M 496 272 L 495 226 C 495 214 509 211 514 221 L 518 266"/>
+    <path d="M 518 266 L 521 215 C 522 203 538 204 541 216 L 541 267"/>
+    <path d="M 541 267 L 548 225 C 550 213 565 216 567 228 L 563 277"/>
+    <path d="M 563 277 L 574 247 C 579 235 593 241 591 253 L 581 298"/>
+    <path d="M 478 300 C 493 323 560 327 581 298"/>
+  </g>
+  <g fill="#f5f9ff">
+    <circle cx="496" cy="272" r="5"/><circle cx="518" cy="266" r="5"/>
+    <circle cx="541" cy="267" r="5"/><circle cx="563" cy="277" r="5"/>
+    <circle cx="478" cy="300" r="5"/>
+  </g>
+  <text x="495" y="354" class="eyebrow" text-anchor="middle">DETECT</text>
+  <text x="495" y="388" class="card-title" text-anchor="middle">MediaPipe Hands</text>
+  <text x="495" y="426" class="card-copy" text-anchor="middle">2 hands • 21 points each</text>
+  <text x="495" y="454" class="card-detail" text-anchor="middle">Local model inference</text>
+  <text x="495" y="478" class="card-detail" text-anchor="middle">No video upload</text>
+
+  <!-- 3: Measure -->
+  <g filter="url(#shadow)">
+    <rect x="660" y="175" width="280" height="350" rx="24" fill="#151d29" stroke="#263244"/>
+  </g>
+  <circle cx="692" cy="207" r="17" fill="url(#accent)"/>
+  <text x="692" y="212" class="step" text-anchor="middle">3</text>
+  <path d="M 720 292 L 874 230" stroke="#41b4ff" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="720" cy="292" r="19" fill="#7de6bc" stroke="#f5f9ff" stroke-width="7"/>
+  <circle cx="874" cy="230" r="19" fill="#7de6bc" stroke="#f5f9ff" stroke-width="7"/>
+  <path d="M 720 314 H 874" stroke="#435168" stroke-width="3" stroke-dasharray="8 9"/>
+  <path d="M 788 314 A 68 68 0 0 0 783 267" fill="none" stroke="#ffc44b" stroke-width="5"/>
+  <text x="800" y="286" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#ffc44b">Δθ</text>
+  <text x="800" y="354" class="eyebrow" text-anchor="middle">MEASURE</text>
+  <text x="800" y="388" class="card-title" text-anchor="middle">Palm axis angle</text>
+  <text x="800" y="426" class="card-copy" text-anchor="middle">Average wrist + MCP points</text>
+  <text x="800" y="454" class="card-detail" text-anchor="middle">Compare with your</text>
+  <text x="800" y="478" class="card-detail" text-anchor="middle">calibrated neutral angle</text>
+
+  <!-- 4: Shape -->
+  <g filter="url(#shadow)">
+    <rect x="965" y="175" width="280" height="350" rx="24" fill="#151d29" stroke="#263244"/>
+  </g>
+  <circle cx="997" cy="207" r="17" fill="url(#accent)"/>
+  <text x="997" y="212" class="step" text-anchor="middle">4</text>
+  <path d="M 1025 292 H 1190" stroke="#435168" stroke-width="3"/>
+  <path d="M 1107 215 V 309" stroke="#435168" stroke-width="3"/>
+  <path d="M 1029 288 C 1055 286 1068 281 1082 269 C 1094 259 1100 252 1107 252 C 1119 252 1131 270 1143 270 C 1158 270 1170 247 1188 225" fill="none" stroke="url(#accent)" stroke-width="7" stroke-linecap="round"/>
+  <rect x="1092" y="238" width="30" height="28" rx="7" fill="#ffc44b" opacity="0.18"/>
+  <text x="1105" y="354" class="eyebrow" text-anchor="middle">SHAPE</text>
+  <text x="1105" y="388" class="card-title" text-anchor="middle">Stable steering</text>
+  <text x="1105" y="426" class="card-copy" text-anchor="middle">Median • range • dead-zone</text>
+  <text x="1105" y="454" class="card-detail" text-anchor="middle">Curve + adaptive smoothing</text>
+  <text x="1105" y="478" class="card-detail" text-anchor="middle">Clamped −1.0 to +1.0</text>
+
+  <!-- 5: Drive -->
+  <g filter="url(#shadow)">
+    <rect x="1270" y="175" width="280" height="350" rx="24" fill="#151d29" stroke="#263244"/>
+  </g>
+  <circle cx="1302" cy="207" r="17" fill="url(#accent)"/>
+  <text x="1302" y="212" class="step" text-anchor="middle">5</text>
+  <g stroke="#41b4ff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 1321 277 C 1326 235 1351 220 1384 235 H 1436 C 1469 220 1494 235 1499 277 C 1503 309 1480 321 1462 296 L 1447 278 H 1373 L 1358 296 C 1340 321 1317 309 1321 277 Z"/>
+    <path d="M 1354 258 H 1382 M 1368 244 V 272"/>
+  </g>
+  <circle cx="1457" cy="249" r="7" fill="#7de6bc"/>
+  <circle cx="1477" cy="266" r="7" fill="#ffc44b"/>
+  <circle cx="1457" cy="283" r="7" fill="#e66970"/>
+  <circle cx="1437" cy="266" r="7" fill="#41b4ff"/>
+  <text x="1410" y="354" class="eyebrow" text-anchor="middle">DRIVE</text>
+  <text x="1410" y="388" class="card-title" text-anchor="middle">Virtual Xbox 360</text>
+  <text x="1410" y="426" class="card-copy" text-anchor="middle">Left-stick X at 100 Hz</text>
+  <text x="1410" y="454" class="card-detail" text-anchor="middle">vgamepad → XInput</text>
+  <text x="1410" y="478" class="card-detail" text-anchor="middle">Racing game steering</text>
+
+  <!-- Safety rail -->
+  <rect x="50" y="570" width="1500" height="276" rx="26" fill="#111823" stroke="#2a374a" stroke-width="2"/>
+  <path d="M 76 614 H 98 L 109 625 L 120 603 L 132 614 H 152" fill="none" stroke="#7de6bc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="172" y="622" class="safety-title">Safety stays between tracking and the game</text>
+  <text x="1498" y="620" class="subtitle" text-anchor="end">Only armed + fresh input is sent</text>
+
+  <g>
+    <rect x="76" y="653" width="340" height="158" rx="18" fill="#182230"/>
+    <circle cx="111" cy="687" r="16" fill="#7de6bc" opacity="0.16"/>
+    <path d="M 104 687 L 109 692 L 119 681" fill="none" stroke="#7de6bc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="141" y="693" class="safety-label">Starts disarmed</text>
+    <text x="101" y="730" class="safety-copy">Arm is allowed only after calibration</text>
+    <text x="101" y="754" class="safety-copy">and three consecutive valid frames.</text>
+    <text x="101" y="784" class="safety-copy safety-green">No accidental startup steering.</text>
+  </g>
+
+  <g>
+    <rect x="445" y="653" width="340" height="158" rx="18" fill="#182230"/>
+    <circle cx="480" cy="687" r="16" fill="#ffc44b" opacity="0.16"/>
+    <path d="M 480 677 V 688 M 480 697 V 698" fill="none" stroke="#ffc44b" stroke-width="4" stroke-linecap="round"/>
+    <text x="510" y="693" class="safety-label">Tracking loss</text>
+    <text x="470" y="730" class="safety-copy">Hold briefly for 120 ms, then return</text>
+    <text x="470" y="754" class="safety-copy">smoothly to center over 280 ms.</text>
+    <text x="470" y="784" class="safety-copy safety-yellow">Defaults shown.</text>
+  </g>
+
+  <g>
+    <rect x="814" y="653" width="340" height="158" rx="18" fill="#182230"/>
+    <circle cx="849" cy="687" r="16" fill="#41b4ff" opacity="0.16"/>
+    <path d="M 849 678 V 687 L 856 692" fill="none" stroke="#41b4ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="879" y="693" class="safety-label">300 ms watchdog</text>
+    <text x="839" y="730" class="safety-copy">If fresh camera values stop arriving,</text>
+    <text x="839" y="754" class="safety-copy">the controller disarms and sends zero.</text>
+    <text x="839" y="784" class="safety-copy safety-blue">Runs outside the camera loop.</text>
+  </g>
+
+  <g>
+    <rect x="1183" y="653" width="340" height="158" rx="18" fill="#182230"/>
+    <circle cx="1218" cy="687" r="16" fill="#e66970" opacity="0.18"/>
+    <rect x="1210" y="679" width="16" height="16" rx="3" fill="none" stroke="#e66970" stroke-width="3"/>
+    <text x="1248" y="693" class="safety-label">F8 emergency neutral</text>
+    <text x="1208" y="730" class="safety-copy">A dedicated hotkey thread immediately</text>
+    <text x="1208" y="754" class="safety-copy">disarms output and publishes center.</text>
+    <text x="1208" y="784" class="safety-copy safety-red">Works if the preview is busy.</text>
+  </g>
+
+  <text x="800" y="895" class="footer" text-anchor="middle">STEERING ONLY  •  NO FORCE FEEDBACK  •  CAMERA PROCESSING STAYS ON THIS PC</text>
+</svg>
