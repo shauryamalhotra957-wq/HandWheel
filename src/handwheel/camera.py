@@ -115,9 +115,6 @@ class CameraWorker(threading.Thread):
                         raise RuntimeError("The camera stopped returning frames.")
 
                     config = self._state.config()
-                    # Tracking always uses canonical mirrored coordinates so the
-                    # preview preference cannot change steering polarity or a
-                    # saved calibration.
                     tracking_frame = cv2.flip(frame, 1)
                     display_frame = tracking_frame if config.mirror else frame
                     rgb = cv2.cvtColor(tracking_frame, cv2.COLOR_BGR2RGB)
