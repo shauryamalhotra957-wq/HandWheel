@@ -457,8 +457,7 @@ class HandWheelApp:
         self.camera_button.configure(text="STOP CAMERA")
 
     def stop_camera(self) -> None:
-        self.controller.set_armed(False)
-        self.controller.publish(0.0)
+        self.controller.neutralize()
         if self.camera_worker is not None:
             worker = self.camera_worker
             worker.stop()
@@ -525,8 +524,7 @@ class HandWheelApp:
         self.state.set_notice("Controller output armed. Press F8 to neutralize.")
 
     def _emergency_neutral(self) -> None:
-        self.controller.set_armed(False)
-        self.controller.publish(0.0)
+        self.controller.neutralize()
         self.state.set_notice("Emergency neutral — controller output disarmed.")
 
     def _update_setting(self, key: str, value: object) -> None:
@@ -621,13 +619,12 @@ class HandWheelApp:
         if self._closing:
             return
         self._closing = True
-        self.controller.set_armed(False)
+        self.controller.neutralize()
         if self.emergency_hotkey is not None:
             self.emergency_hotkey.stop()
             self.emergency_hotkey.join(timeout=1.0)
         self.stop_camera()
-        self.controller.stop()
-        self.controller.join(timeout=2.0)
+        self.controller.shutdown(timeout=2.0)
         try:
             self.state.save()
         except OSError:
@@ -647,7 +644,7 @@ def main() -> None:
     _enable_windows_dpi_awareness()
     root = tk.Tk()
     app = HandWheelApp(root)
-    atexit.register(lambda: app.controller.set_armed(False))
+    atexit.register(app.controller.shutdown)
 
     def handle_signal(_signum: int, _frame: object) -> None:
         root.after(0, app.close)

@@ -61,15 +61,30 @@ class ControllerLoop(threading.Thread):
     def set_armed(self, armed: bool) -> bool:
         with self._lock:
             self._armed = bool(armed and self._available)
+            if not self._armed:
+                self._target = 0.0
             return self._armed
 
     def toggle_armed(self) -> bool:
         with self._lock:
             self._armed = bool(self._available and not self._armed)
+            if not self._armed:
+                self._target = 0.0
             return self._armed
 
+    def neutralize(self) -> None:
+        with self._lock:
+            self._target = 0.0
+            self._armed = False
+
     def stop(self) -> None:
+        self.neutralize()
         self._stop_event.set()
+
+    def shutdown(self, timeout: float = 2.0) -> None:
+        self.stop()
+        if self.is_alive() and threading.current_thread() is not self:
+            self.join(timeout=timeout)
 
     def run(self) -> None:
         gamepad = None
@@ -113,6 +128,7 @@ class ControllerLoop(threading.Thread):
                 if armed and stale:
                     with self._lock:
                         self._armed = False
+                        self._target = 0.0
                         self._message = (
                             "Output disarmed — camera/controller watchdog timed out"
                         )
@@ -137,6 +153,7 @@ class ControllerLoop(threading.Thread):
             with self._lock:
                 self._available = False
                 self._armed = False
+                self._target = 0.0
                 self._message = f"Controller stopped: {type(error).__name__}"
         finally:
             if gamepad is not None:
@@ -146,4 +163,6 @@ class ControllerLoop(threading.Thread):
                 except Exception:
                     pass
             with self._lock:
+                self._available = False
                 self._armed = False
+                self._target = 0.0
