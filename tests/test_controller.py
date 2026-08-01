@@ -98,3 +98,35 @@ def test_preview_only_marker_prevents_controller_creation(monkeypatch, tmp_path)
     finally:
         controller.stop()
         controller.join(timeout=1.0)
+
+
+def test_neutralize_clears_latched_target_and_shutdown_resets_gamepad(monkeypatch):
+    FakeGamepad.instances.clear()
+    monkeypatch.delenv("HANDWHEEL_PREVIEW_ONLY", raising=False)
+    monkeypatch.setitem(
+        sys.modules, "vgamepad", types.SimpleNamespace(VX360Gamepad=FakeGamepad)
+    )
+    controller = ControllerLoop(rate_hz=200.0, watchdog_seconds=0.5)
+    controller.start()
+    assert controller.wait_until_ready().available
+
+    controller.publish(0.8)
+    assert controller.set_armed(True)
+    assert wait_for(lambda: any(value > 0.7 for value in FakeGamepad.instances[0].values))
+
+    controller.neutralize()
+    assert wait_for(lambda: FakeGamepad.instances[0].values[-1] == 0.0)
+    assert controller.status().armed is False
+
+    values_after_neutral = len(FakeGamepad.instances[0].values)
+    assert controller.set_armed(True)
+    time.sleep(0.03)
+    assert all(
+        value == 0.0 for value in FakeGamepad.instances[0].values[values_after_neutral:]
+    )
+
+    controller.shutdown(timeout=1.0)
+    assert controller.is_alive() is False
+    assert controller.status().available is False
+    assert controller.status().armed is False
+    assert FakeGamepad.instances[0].values[-1] == 0.0

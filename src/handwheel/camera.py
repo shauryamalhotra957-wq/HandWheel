@@ -217,20 +217,8 @@ class CameraWorker(threading.Thread):
                     )
         except Exception as error:
             failure_message = str(error)
-            self._controller.publish(0.0)
-            config = self._state.config()
-            self._state.publish(
-                Telemetry(
-                    camera_running=False,
-                    tracking_state=TrackingState.LOST,
-                    steering=0.0,
-                    message=str(error),
-                    calibrated=config.calibrated,
-                )
-            )
         finally:
-            self._controller.publish(0.0)
-            self._controller.set_armed(False)
+            self._controller.neutralize()
             if cap is not None:
                 cap.release()
             config = self._state.config()
