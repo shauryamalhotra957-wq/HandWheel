@@ -11,7 +11,7 @@ requires-python = ">=3.11,<3.13"
 license = { text = "MIT" }
 authors = [{ name = "HandWheel contributors" }]
 dependencies = [
-    "mediapipe==0.10.35",
+    "mediapipe==1.0.1",
     "opencv-contrib-python==4.13.0.92",
     "Pillow>=11.2,<13",
 ]
