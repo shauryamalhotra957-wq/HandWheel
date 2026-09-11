@@ -35,4 +35,5 @@ allow-direct-references = true
 
 [tool.pytest.ini_options]
 addopts = "-q"
+pythonpath = ["src"]
 testpaths = ["tests"]
