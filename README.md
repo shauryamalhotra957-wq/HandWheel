@@ -1,5 +1,8 @@
 # HandWheel
 
+[![CI](https://github.com/shauryamalhotra957-wq/HandWheel/actions/workflows/ci.yml/badge.svg)](https://github.com/shauryamalhotra957-wq/HandWheel/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 HandWheel turns a two-hand “air steering wheel” gesture into the left stick of a
 virtual Xbox 360 controller. It is designed for Windows racing games that accept
 XInput controllers.
