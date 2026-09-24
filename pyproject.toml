@@ -1,39 +1,12 @@
-[build-system]
-requires = ["hatchling>=1.27"]
-build-backend = "hatchling.build"
+[tool.ruff]
+target-version = "py312"
+line-length = 100
 
-[project]
-name = "handwheel"
-version = "0.1.0"
-description = "Low-latency webcam hand tracking mapped to a virtual Xbox steering input."
-readme = "README.md"
-requires-python = ">=3.11,<3.13"
-license = { text = "MIT" }
-authors = [{ name = "HandWheel contributors" }]
-dependencies = [
-    "mediapipe==0.10.35",
-    "opencv-contrib-python==4.13.0.92",
-    "Pillow>=11.2,<13",
-]
-
-[project.optional-dependencies]
-controller = [
-    "vgamepad @ https://github.com/yannbouteiller/vgamepad/archive/3f910aa8bbde49a576683db74ad5e4a0879f8a80.zip ; sys_platform == 'win32'",
-]
-dev = [
-    "pytest>=8.3,<10",
-]
-
-[project.scripts]
-handwheel = "handwheel.app:main"
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/handwheel"]
-
-[tool.hatch.metadata]
-allow-direct-references = true
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
 
 [tool.pytest.ini_options]
-addopts = "-q"
-pythonpath = ["src"]
-testpaths = ["tests"]
+testpaths = ["tests", "sim"]
+python_files = ["test_*.py"]
+addopts = "-v --strict-markers"
