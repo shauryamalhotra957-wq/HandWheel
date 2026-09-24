@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  handwheel:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - ENV=production
+    command: python tests/benchmark_tracking_jitter.py
